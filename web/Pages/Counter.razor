@@ -1,0 +1,19 @@
+﻿@page "/counter"
+
+<PageTitle>Counter</PageTitle>
+
+<MatH5>Counter</MatH5>
+<p>
+    <MatBody1>Current Count: @_currentCount</MatBody1>
+</p>
+
+<MatButton Raised="true" OnClick="IncrementCount">Click Me</MatButton>
+
+@code {
+    private int _currentCount;
+
+    private void IncrementCount()
+    {
+        _currentCount++;
+    }
+}

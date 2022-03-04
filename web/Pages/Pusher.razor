@@ -1,0 +1,28 @@
+@page "/pusher"
+@using web.Constants
+@inject PusherServer.Pusher _pusherServer;
+
+<PageTitle>Pusher</PageTitle>
+
+<MatH5>Pusher</MatH5>
+
+<MatButton Raised="true" OnClick="SendNewMessage">Send A New Message</MatButton>
+
+@code {
+    public class Message
+    {
+        public string? Text { get; set; }
+
+        public DateTimeOffset? Date { get; set; }
+    }
+
+    private Task SendNewMessage()
+    {
+        return _pusherServer.TriggerAsync(MessagingConstants.Channel, MessagingConstants.Event, new Message
+        {
+            Text = "hello",
+            Date = DateTimeOffset.UtcNow
+        });
+    }
+
+}

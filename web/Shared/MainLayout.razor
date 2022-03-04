@@ -1,0 +1,38 @@
+﻿@inherits LayoutComponentBase
+
+<PageTitle>ControlTower.Platform.Portal.Web</PageTitle>
+
+<div class="page">
+    <MatAppBarContainer>
+        <MatAppBar Fixed="true">
+            <MatAppBarRow>
+                <MatAppBarSection>
+                    <MatIconButton Icon="menu" OnClick="ToggleMenu"></MatIconButton>
+                    <MatAppBarTitle>Pusher Playground</MatAppBarTitle>
+                </MatAppBarSection>
+            </MatAppBarRow>
+        </MatAppBar>
+        <MatAppBarContent>
+            <MatDrawerContainer>
+                <MatDrawer @bind-Opened="@_opened">
+                    <NavMenu></NavMenu>
+                </MatDrawer>
+                <MatDrawerContent>
+                    <section class="container-fluid" style="flex: 1;">
+                        @Body
+                    </section>
+                </MatDrawerContent>
+            </MatDrawerContainer>
+        </MatAppBarContent>
+    </MatAppBarContainer>
+</div>
+
+@code
+{
+    bool _opened = true;
+
+    void ToggleMenu()
+    {
+        _opened = !_opened;
+    }
+}

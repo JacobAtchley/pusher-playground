@@ -1,0 +1,42 @@
+@code {
+
+    [Parameter]
+    public bool Closed
+    {
+        get => _closed;
+        set
+        {
+            _closed = value;
+            _style = value ? "display:none" : string.Empty;
+        }
+    }
+
+    [Parameter]
+    public int Size
+    {
+        get => _size;
+        set
+        {
+            _size = value;
+            _spinnerStyle = FormatSpinnerStyle(value);
+        }
+    }
+
+    private static string FormatSpinnerStyle(int value)
+    {
+        return $"width: {value}vw; height: {value}vh";
+    }
+
+    private string? _style;
+    private string? _spinnerStyle = FormatSpinnerStyle(25);
+    private bool _closed;
+    private int _size = 25;
+}
+
+<div class="spinner-overlay" style="@_style">
+    <div class="spinner-overlay-container">
+        <div class="spinner-overlay-content">
+            <MatProgressCircle Indeterminate="true" Style="@_spinnerStyle"></MatProgressCircle>
+        </div>
+    </div>
+</div>

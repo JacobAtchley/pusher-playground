@@ -1,0 +1,152 @@
+@page "/form"
+@using System.ComponentModel.DataAnnotations
+
+<EditForm Model="_myModel" OnSubmit="OnFormSubmit">
+    <DataAnnotationsValidator/>
+    <div class="mat-layout-grid mat-layout-grid-align-left" style="max-width: 800px;">
+        <div class="mat-layout-grid-inner">
+            <div class="mat-layout-grid-cell">
+                <MatTextField Label="Username" @bind-Value="_myModel.Username" Outlined="true"/>
+                <ValidationMessage For="@(() => _myModel.Username)"/>
+            </div>
+            <div class="mat-layout-grid-cell">
+                <MatTextField Label="Password" @bind-Value="_myModel.Password" Type="password" Outlined="true"/>
+                <ValidationMessage For="@(() => _myModel.Password)"/>
+            </div>
+        </div>
+        <br/>
+        <div class="mat-layout-grid-inner">
+            <div class="mat-layout-grid-cell">
+                <MatDatePicker Label="Start Date" @bind-Value="_myModel.StartDate" Outlined="true"/>
+                <ValidationMessage For="@(() => _myModel.StartDate)"/>
+            </div>
+            <div class="mat-layout-grid-cell">
+                <MatDatePicker Label="End Date" @bind-Value="_myModel.EndDate" Outlined="true"/>
+                <ValidationMessage For="@(() => _myModel.EndDate)"/>
+            </div>
+        </div>
+        <br/>
+        <div class="mat-layout-grid-inner">
+            <div class="mat-layout-grid-cell">
+                <MatTextField Label="MFA" @bind-Value="_myModel.Mfa" Outlined="true"/>
+                <ValidationMessage For="@(() => _myModel.Mfa)"/>
+            </div>
+            <div class="mat-layout-grid-cell">
+                <MatTextField Label="Comment" @bind-Value="_myModel.Comment" Outlined="true"/>
+                <ValidationMessage For="@(() => _myModel.Comment)"/>
+            </div>
+            <div class="mat-layout-grid-cell">
+                <MatTextField Label="Comment" @bind-Value="_myModel.Car" Outlined="true"/>
+                <ValidationMessage For="@(() => _myModel.Car)"/>
+            </div>
+            <div class="mat-layout-grid-cell">
+                <MatSelectItem Label="SelectItem" @bind-Value="@_myModel.Gender" Items="@_genderItems" Outlined="true"/>
+                <ValidationMessage For="@(() => _myModel.Gender)"/>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <div class="mat-layout-grid-cell mat-layout-grid-cell-span-4">
+        <MatButton Type="submit" Raised="true" TrailingIcon="login">Login</MatButton>
+        <MatButton Raised="true" OnClick="Reset">Reset</MatButton>
+    </div>
+</EditForm>
+
+<Spinner Closed="!Saving"></Spinner>
+
+@code {
+    public bool Saving { get; set; }
+
+    readonly LoginModel _myModel = new()
+    {
+        Car = "Barracuda",
+        Comment = "Fake",
+        Gender = "M",
+        Password = "p@55word",
+        Username = "fox.mulder",
+        EndDate = DateTime.Now.AddDays(1),
+        StartDate = DateTime.Now.AddDays(-1),
+        Mfa = "654321"
+    };
+
+    readonly string[] _genderItems =
+    {
+        "",
+        "M",
+        "W"
+    };
+
+    [Inject]
+    protected IMatToaster? Toaster { get; set; }
+
+    void Reset()
+    {
+        _myModel.Username = null;
+        _myModel.Password = null;
+        _myModel.Mfa = null;
+        _myModel.StartDate = DateTime.MinValue;
+        _myModel.EndDate = null;
+        _myModel.Comment = null;
+    }
+
+    public class LoginModel
+    {
+        [Required]
+        public string? Username { get; set; }
+
+        [Required]
+        [MinLength(8)]
+        public string? Password { get; set; }
+
+        [Required]
+        public string? Gender { get; set; }
+
+        [Required]
+        public string? Car { get; set; }
+
+        [Required]
+        [CustomValidation(typeof(LoginModel), nameof(RequiredDateTime))]
+        public DateTime StartDate { get; set; }
+
+        [Required]
+        public DateTime? EndDate { get; set; }
+
+        public string? Comment { get; set; }
+
+        [Required]
+        [CustomValidation(typeof(LoginModel), nameof(ValidateMfa))]
+        public string? Mfa { get; set; }
+
+        public static ValidationResult? ValidateMfa(string mfa, ValidationContext vc)
+        {
+            return string.Equals("654321", mfa)
+                ? ValidationResult.Success
+                : new ValidationResult("Incorrect MFA OTP", new[]
+                {
+                    vc.MemberName
+                }!);
+        }
+
+        public static ValidationResult? RequiredDateTime(DateTime value, ValidationContext vc)
+        {
+            return value > DateTime.MinValue
+                ? ValidationResult.Success
+                : new ValidationResult($"The {vc.MemberName} field is required.", new[]
+                {
+                    vc.MemberName
+                }!);
+        }
+    }
+
+    private async Task OnFormSubmit(EditContext arg)
+    {
+        if (arg.Validate())
+        {
+            Saving = true;
+            await Task.Delay(1_000);
+            Console.WriteLine("Form Is Valid");
+            Saving = false;
+            Toaster?.Add("Form Saved!", MatToastType.Success, "Form Info", "thumb_up");
+        }
+    }
+}

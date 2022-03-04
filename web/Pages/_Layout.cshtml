@@ -1,0 +1,67 @@
+﻿@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.Extensions.Options
+@using PusherServer
+@using web.Constants
+@using web.Models
+@namespace web.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject IOptions<PusherPlaygroundConfig> _options;
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="~/" />
+    <script src="_content/MatBlazor/dist/matBlazor.js"></script>
+    <link href="_content/MatBlazor/dist/matBlazor.css" rel="stylesheet" />
+    <link href="css/site.css" rel="stylesheet" />
+    <link href="web.styles.css" rel="stylesheet" />
+    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+
+<script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+  <script>
+
+    // Enable pusher logging - don't include this in production
+    Pusher.logToConsole = true;
+
+
+    function generateUserName(){
+        var a = ["Small", "Blue", "Ugly", "Green", "Grey", "Pink"];
+        var b = ["Bear", "Dog", "Banana", "Cat", "Horse", "Turtle"];
+
+        var rA = Math.floor(Math.random()*a.length);
+        var rB = Math.floor(Math.random()*b.length);
+        var name = a[rA] + b[rB];
+
+        return name;
+    }
+
+    var pusher = new Pusher('@_options.Value.Key', {
+      cluster: '@_options.Value.Cluster',
+      authEndpoint: '/api/pusher/auth/' + generateUserName()
+    });
+
+    var channel = pusher.subscribe('@MessagingConstants.Channel');
+    channel.bind('@MessagingConstants.Event', function(data) {
+      alert(JSON.stringify(data));
+    });
+  </script>
+</head>
+<body>
+    @RenderBody()
+
+    <div id="blazor-error-ui">
+        <environment include="Staging,Production">
+            An error has occurred. This application may no longer respond until reloaded.
+        </environment>
+        <environment include="Development">
+            An unhandled exception has occurred. See browser dev tools for details.
+        </environment>
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+
+    <script src="_framework/blazor.server.js"></script>
+</body>
+</html>

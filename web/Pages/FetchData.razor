@@ -1,0 +1,68 @@
+﻿@page "/fetchdata"
+@using web.Data
+
+<PageTitle>Weather forecast</PageTitle>
+@inject WeatherForecastService _forecastService
+
+<MatH5>Weather Forecasts</MatH5>
+
+<p>
+    <MatBody2>
+        This component demonstrates fetching data from a service.
+    </MatBody2>
+</p>
+
+@if (_forecasts == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <MatTable Items="@_forecasts" PageSize="7" PageSizes="_pageSizes">
+        <MatTableHeader>
+            <th>Date</th>
+            <th>Temp. (C)</th>
+            <th>Temp. (F)</th>
+            <th>Summary</th>
+        </MatTableHeader>
+        <MatTableRow>
+            <td>@context.Date.ToShortDateString()</td>
+            <td>@context.TemperatureC</td>
+            <td>@context.TemperatureF</td>
+            <td>@context.Summary</td>
+        </MatTableRow>
+    </MatTable>
+}
+
+@code {
+    private WeatherForecast[]? _forecasts;
+
+    private readonly BaseMatTable.PageSizeStructure[] _pageSizes =
+    {
+        new()
+        {
+            Text = "7",
+            Value = 7
+        },
+
+        new()
+        {
+            Text = "14",
+            Value = 14
+        },
+
+        new()
+        {
+            Text = "21",
+            Value = 21
+        }
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        _forecasts = await _forecastService.GetForecastAsync(DateTime.Now);
+    }
+
+}
