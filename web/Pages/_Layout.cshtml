@@ -36,23 +36,45 @@
         return name;
     }
 
+    const userName = generateUserName();
+
     var pusher = new Pusher('@_options.Value.Key', {
       cluster: '@_options.Value.Cluster',
-      authEndpoint: '/api/pusher/auth/' + generateUserName()
+      authEndpoint: `/api/pusher/auth/${userName}`
     });
 
     pusher.connection.bind('connected', function() {
         const channel = pusher.subscribe('@MessagingConstants.PRIVATE_CHANNEL');
         channel.bind('@MessagingConstants.EVENT', function(data) {
-          alert(JSON.stringify(data));
+            console.log('message', data);
+            logEvent(data.Text, data.Date);
         });
 
         const presenceChannel = pusher.subscribe('@MessagingConstants.PRESENCE_CHANNEL');
-        channel.bind('pusher:subscription_succeeded', function (){
-            var c = presenceChannel;
-            debugger;
+        channel.bind('pusher:subscription_succeeded', function (d){
+            console.log('presence connected', d);
+            logEvent('Connect to Presence Channel', presenceChannel.members.count);
         });
     });
+
+    function logEvent(primary, secondary){
+        const events = document.getElementById('messageEvents');
+
+        if (!events)
+        {
+            return;
+        }
+
+       const message = `<li class=" mdc-list-item mdc-ripple-upgraded">
+                             <span class=" mdc-list-item__text" style="">
+                                 <span class=" mdc-list-item__primary-text" style="">${primary}</span>
+                                 <span class=" mdc-list-item__secondary-text" style="">${secondary}</span>
+                             </span>
+                         </li>
+                         <br>
+                         <li role="separator" class=" mdc-list-divider" style=""></li>`;
+        events.insertAdjacentHTML('beforeend', message);
+    }
   </script>
 </head>
 <body>

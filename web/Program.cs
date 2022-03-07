@@ -95,8 +95,8 @@ app.MapPost("/api/pusher/auth/{username}", (
 
     string? authData = null;
 
-    // if (Channel.GetChannelType(channelName) == ChannelTypes.Presence)
-    // {
+    if (Channel.GetChannelType(channelName) == ChannelTypes.Presence)
+    {
         var channelData = new PresenceChannelData
         {
             user_id = socketId,
@@ -104,12 +104,29 @@ app.MapPost("/api/pusher/auth/{username}", (
         };
 
         authData = pusherServer.Authenticate(channelName, socketId, channelData).ToJson();
-    // }
-    // else
-    // {
-    //     authData = pusherServer.Authenticate(channelName, socketId).ToJson();
-    // }
+    }
+    else
+    {
+        authData = pusherServer.Authenticate(channelName, socketId).ToJson();
+    }
 
     return authData;
+});
+
+app.MapGet("/api/pusher/list-members", async (PusherClient.Pusher pusherClient, CancellationToken cancellationToken) =>
+{
+    await pusherClient.ConnectAsync();
+
+    var channel = pusherClient.GetChannel(MessagingConstants.PRESENCE_CHANNEL);
+
+    if (channel is not GenericPresenceChannel<ChatMember> pc) return new List<string>();
+
+    var members = pc.GetMembers()
+        .Select(x => x.Value)
+        .Select(x => x.Name)
+        .ToList();
+
+    return members;
+
 });
 app.Run();

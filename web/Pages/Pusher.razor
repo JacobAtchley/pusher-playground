@@ -8,7 +8,12 @@
 
 <MatButton Raised="true" OnClick="SendNewMessage">Send A New Message</MatButton>
 
+<ul class="mdc-list" style="" aria-orientation="vertical" id="messageEvents">
+
+</ul>
+
 @code {
+
     public class Message
     {
         public string? Text { get; set; }

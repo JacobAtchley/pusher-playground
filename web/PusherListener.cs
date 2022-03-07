@@ -26,8 +26,6 @@ public class PusherListener : BackgroundService
         await _pusher.SubscribeAsync(MessagingConstants.PRIVATE_CHANNEL);
 
         var channel = await _pusher.SubscribePresenceAsync<ChatMember>(MessagingConstants.PRESENCE_CHANNEL);
-        _logger.LogInformation("Presence Subscribed " + channel.IsSubscribed);
-
         channel.MemberAdded += OnMemberAdded;
         channel.MemberRemoved += OnMemberRemoved;
     }
