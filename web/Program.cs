@@ -3,6 +3,7 @@ using MatBlazor;
 using Microsoft.Extensions.Options;
 using PusherClient;
 using PusherServer;
+using web;
 using web.Constants;
 using web.Data;
 using web.Models;
@@ -31,13 +32,24 @@ builder.Services.AddMatToaster(config =>
     config.VisibleStateDuration = 3000;
 });
 builder.Services.Configure<PusherPlaygroundConfig>(builder.Configuration.GetSection("Pusher"));
+builder.Services.AddHttpClient(nameof(PusherPlaygroundHttpAuthorizer))
+    .ConfigureHttpClient(x =>
+    {
+        x.BaseAddress = new Uri("https://localhost:7212");
+        x.Timeout = TimeSpan.FromMinutes(5);
+    })
+    .ConfigurePrimaryHttpMessageHandler(x => new HttpClientHandler
+    {
+        ServerCertificateCustomValidationCallback = (_, _, _, _) => true,
+    });
 builder.Services.AddSingleton(provider =>
 {
     var options = provider.GetService<IOptions<PusherPlaygroundConfig>>()?.Value!;
+    var httpFactory = provider.GetService<IHttpClientFactory>();
     var pusher = new PusherClient.Pusher(options.Key, new()
     {
         Cluster = options.Cluster,
-        Authorizer = new HttpAuthorizer("https://localhost:7212/api/pusher/auth/server")
+        Authorizer = new PusherPlaygroundHttpAuthorizer(httpFactory)
     });
     return pusher;
 });

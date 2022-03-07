@@ -1,6 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Components.Web
 @using Microsoft.Extensions.Options
-@using PusherServer
 @using web.Constants
 @using web.Models
 @namespace web.Pages
@@ -42,9 +41,17 @@
       authEndpoint: '/api/pusher/auth/' + generateUserName()
     });
 
-    var channel = pusher.subscribe('@MessagingConstants.Channel');
-    channel.bind('@MessagingConstants.Event', function(data) {
-      alert(JSON.stringify(data));
+    pusher.connection.bind('connected', function() {
+        const channel = pusher.subscribe('@MessagingConstants.PRIVATE_CHANNEL');
+        channel.bind('@MessagingConstants.EVENT', function(data) {
+          alert(JSON.stringify(data));
+        });
+
+        const presenceChannel = pusher.subscribe('@MessagingConstants.PRESENCE_CHANNEL');
+        channel.bind('pusher:subscription_succeeded', function (){
+            var c = presenceChannel;
+            debugger;
+        });
     });
   </script>
 </head>

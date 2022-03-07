@@ -18,7 +18,7 @@
 
     private Task SendNewMessage()
     {
-        return _pusherServer.TriggerAsync(MessagingConstants.Channel, MessagingConstants.Event, new Message
+        return _pusherServer.TriggerAsync(MessagingConstants.PRIVATE_CHANNEL, MessagingConstants.EVENT, new Message
         {
             Text = "hello",
             Date = DateTimeOffset.UtcNow

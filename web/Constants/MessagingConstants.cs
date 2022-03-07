@@ -2,7 +2,8 @@ namespace web.Constants;
 
 public static class MessagingConstants
 {
-    public const string Channel = "private-playground-channel";
-    public const string PresenceChannel = "presence-private-playground-channel";
-    public const string Event = "message";
+    private const string CHANNEL = "playground-channel";
+    public const string PRIVATE_CHANNEL = $"private-{CHANNEL}";
+    public const string PRESENCE_CHANNEL = $"presence-{CHANNEL}";
+    public const string EVENT = "message";
 }
